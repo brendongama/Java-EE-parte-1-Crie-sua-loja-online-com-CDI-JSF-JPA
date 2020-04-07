@@ -1,5 +1,6 @@
 package br.com.casadocodigo.beans;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.Part;
 import javax.transaction.Transactional;
 
 import br.com.casadocodigo.daos.AutorDao;
@@ -28,15 +30,17 @@ public class AdminLivrosBean {
 	@Inject
 	private FacesContext context;
 	
+	private Part capaLivro;
+	
 	private List<Integer> autoresId = new ArrayList<Integer>();
 		
 	
 	@Transactional
-	public String salvar() {
-		for(Integer autorId: autoresId) {
-			livro.getAutores().add(new Autor(autorId));
-		}
+	public String salvar() throws IOException {
 		dao.salvar(livro);
+		
+		capaLivro.write("/casadocodigo/livros/" + capaLivro.getSubmittedFileName());
+		
 		context = FacesContext.getCurrentInstance();
 		context.getExternalContext()
 			.getFlash().setKeepMessages(true);		
@@ -72,5 +76,13 @@ public class AdminLivrosBean {
 
 	public void setAutoresId(List<Integer> autoresId) {
 		this.autoresId = autoresId;
+	}
+
+	public Part getCapaLivro() {
+		return capaLivro;
+	}
+
+	public void setCapaLivro(Part capaLivro) {
+		this.capaLivro = capaLivro;
 	}
 }
